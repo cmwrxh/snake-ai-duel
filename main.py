@@ -1,3 +1,4 @@
+HIGHSCORE_FILE = "highscore.txt"
 import curses
 from curses import wrapper
 import time
@@ -148,6 +149,16 @@ def main(stdscr):
             w.refresh()
             w.getch()
             break
+            # Save high score (simple)
+try:
+    with open(HIGHSCORE_FILE, "r") as f:
+        hs = int(f.read().strip())
+except:
+    hs = 0
+new_hs = max(hs, max(player['score'], ai['score']))
+with open(HIGHSCORE_FILE, "w") as f:
+    f.write(str(new_hs))
+w.addstr(sh//2 + 2, sw//2 - 15, f"High Score: {new_hs}")
 
 if __name__ == "__main__":
     wrapper(main)
