@@ -71,7 +71,41 @@ def main(stdscr):
         # Draw player
         for y, x in player['body']:
             w.addch(y, x, '█', curses.color_pair(player['color']))
+        # --- AI simple greedy logic ---
+        ay, ax = ai['body'][0]
+        dy, dx = food[0] - ay, food[1] - ax
 
+        possible_dirs = [
+            (-1, 0), (1, 0), (0, -1), (0, 1)
+        ]
+
+        best_dir = ai['dir']
+        best_dist = abs(dy) + abs(dx)
+
+        for d in possible_dirs:
+            ny, nx = ay + d[0], ax + d[1]
+            if (ny, nx) in ai['body'] or ny in (0, sh-1) or nx in (0, sw-1):
+                continue
+            new_dist = abs(food[0] - ny) + abs(food[1] - nx)
+            if new_dist < best_dist:
+                best_dist = new_dist
+                best_dir = d
+
+        ai['dir'] = best_dir
+
+        # Move AI
+        any, anx = ay + ai['dir'][0], ax + ai['dir'][1]
+        ai['body'].insert(0, (any, anx))
+
+        if (any, anx) == food:
+            ai['score'] += 1
+            food = (random.randint(1, sh-2), random.randint(1, sw-2))
+        else:
+            ai['body'].pop()
+
+        # Draw AI
+        for y, x in ai['body']:
+            w.addch(y, x, '█', curses.color_pair(ai['color']))
         w.refresh()
 
 if __name__ == "__main__":
